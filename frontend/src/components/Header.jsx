@@ -375,18 +375,18 @@ export default function Header() {
 // }
 
 
-import { Menu, Mic } from "lucide-react";
+import { Menu, Mic, LogOut } from "lucide-react";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
+import LogoutModal from "./LogoutModal";
 
-export default function Header({ hideLogo = false }) {
+export default function Header({ hideLogo = false, onLogout }) {
   const [open, setOpen] = useState(false);
   const [listening, setListening] = useState(false);
-
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const recognitionRef = useRef(null);
-  const hasResultRef = useRef(false); // 🔑 KEY FIX
-
+  const hasResultRef = useRef(false);
   const navigate = useNavigate();
 
   const startListening = () => {
@@ -395,7 +395,6 @@ export default function Header({ hideLogo = false }) {
       return;
     }
 
-    // Stop any existing session
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       recognitionRef.current = null;
@@ -442,6 +441,15 @@ export default function Header({ hideLogo = false }) {
     recognition.start();
   };
 
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
+    onLogout();
+  };
+
   return (
     <>
       <header className="relative z-20 w-full flex justify-between items-center px-6 py-5 bg-white shadow">
@@ -471,10 +479,19 @@ export default function Header({ hideLogo = false }) {
             className="w-6 h-6 cursor-pointer"
             onClick={() => setOpen(true)}
           />
+
+          <button onClick={handleLogout} title="Logout">
+            <LogOut className="w-6 h-6 cursor-pointer text-gray-700 hover:text-red-500 transition" />
+          </button>
         </div>
       </header>
 
       <MenuDrawer open={open} setOpen={setOpen} />
+      <LogoutModal 
+        isOpen={showLogoutModal} 
+        onConfirm={confirmLogout}
+        onCancel={() => setShowLogoutModal(false)}
+      />
     </>
   );
 }
