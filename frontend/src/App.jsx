@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { auth } from "./firebase/firebaseConfig";
+
 
 import Home from "./pages/Home";
 import SearchResults from "./pages/SearchResults";
@@ -13,14 +15,19 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("user");
-    if (user) {
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
-  }, []);
+  // 🔥 Firebase test (ADDED LINE)
+  console.log("🔥 Firebase Auth connected:", auth);
+
+  // Check if user is logged in
+  const user = localStorage.getItem("user");
+  if (user) {
+    setIsAuthenticated(true);
+  }
+  setLoading(false);
+}, []);
+
 
   const handleLogout = () => {
     localStorage.removeItem("user");
