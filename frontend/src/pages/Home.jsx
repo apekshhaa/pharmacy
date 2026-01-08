@@ -1,46 +1,71 @@
+import { useEffect, useRef } from "react";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import { useNavigate } from "react-router-dom";
+import RotatingText from "../components/RotatingText";
+import lottie from "lottie-web";
 
 export default function Home({ onLogout, onNavigate }) {
   const navigate = useNavigate();
+  const doctorAnimRef = useRef(null);
+
+  useEffect(() => {
+    if (!doctorAnimRef.current) return;
+    const anim = lottie.loadAnimation({
+      container: doctorAnimRef.current,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/animations/doctor-animation.json",
+    });
+    return () => anim?.destroy();
+  }, []);
 
   const goToAssistant = () => {
-    // Use shared loader hook before navigation when available
     const doNav = () => navigate("/assistant");
     onNavigate ? onNavigate(doNav) : doNav();
   };
 
   return (
-    <div className="relative min-h-screen bg-transparent">
+    <div className="min-h-screen">
       <Header hideLogo={false} onLogout={onLogout} />
 
-      <main className="flex items-center justify-center min-h-screen">
-        <div className="relative w-[85vw] max-w-[1200px] animate-tabletFloat">
-          {/* Tablet image */}
-          <img
-            src="/tablet.png"
-            alt="Tablet"
-            className="w-full h-auto select-none pointer-events-none"
-          />
+      <main className="px-6 py-12">
+        <div className="mx-auto max-w-4xl text-center">
+          {/* Title with rotating text */}
+          <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-8">
+            <span>Your </span>
+            <RotatingText
+              texts={[
+                "intelligent",
+                "smart",
+                "advanced",
+                "AI-powered",
+              ]}
+              splitBy="characters"
+              staggerDuration={0.03}
+              mainClassName="text-blue-700"
+            />
+            <span> medical assistant</span>
+          </h1>
 
-          {/* Screen content */}
-          <div className="absolute inset-[6%] rounded-2xl bg-black/80 flex flex-col items-center justify-center text-center px-6">
-            <h1 className="text-white text-3xl md:text-4xl font-semibold mb-6">
-              Your intelligent medical assistant
-            </h1>
-
-            <div className="w-full max-w-[700px] mb-6">
-              <SearchBar />
-            </div>
-
-            <button
-              onClick={goToAssistant}
-              className="px-6 py-3 bg-white text-black rounded-full font-semibold hover:scale-105 transition"
-            >
-              Ask SmartRX
-            </button>
+          {/* Search bar */}
+          <div className="max-w-xl mx-auto mb-8">
+            <SearchBar />
           </div>
+
+          {/* Doctor animation */}
+          <div className="flex justify-center mb-6">
+            <div ref={doctorAnimRef} className="w-[320px] h-[320px] md:w-[420px] md:h-[420px]" />
+          </div>
+
+          {/* Ask SmartRX button */}
+          <button
+            onClick={goToAssistant}
+            className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition"
+          >
+            Ask SmartRX
+          </button>
         </div>
       </main>
     </div>
