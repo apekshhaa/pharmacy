@@ -102,6 +102,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../components/Login.css";
 import { loginWithEmail, loginWithGoogle } from "../services/firebaseAuth";
+import { resetPassword } from "../services/firebaseAuth";
+
 
 export default function Login({ setIsAuthenticated, onNavigate }) {
   const [email, setEmail] = useState("");
@@ -144,6 +146,23 @@ export default function Login({ setIsAuthenticated, onNavigate }) {
     }
   };
 
+  const handleForgotPassword = async () => {
+  if (!email) {
+    setError("Please enter your email to reset password");
+    return;
+  }
+
+  try {
+    await resetPassword(email);
+    setError("");
+    alert("📩 Password reset link sent to your email");
+  } catch (err) {
+    console.error(err);
+    setError("❌ Failed to send reset email");
+  }
+};
+
+
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
@@ -173,6 +192,15 @@ export default function Login({ setIsAuthenticated, onNavigate }) {
           />
           <label>Password</label>
         </div>
+
+        {/* 🔐 Forgot Password link */}
+        <span
+          className="forgot-password-link"
+          onClick={handleForgotPassword}
+        >
+          Forgot password?
+        </span>
+
 
         <button className="login-btn" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
