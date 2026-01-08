@@ -7,6 +7,7 @@ import HowItWorks from "../components/HowItWorks";
 export default function Home({ onLogout }) {
   const vantaRef = useRef(null);
   const navigate = useNavigate();
+  const lottieRef = useRef(null);
 
   useEffect(() => {
     let effect = null;
@@ -62,6 +63,25 @@ export default function Home({ onLogout }) {
     };
   }, []);
 
+  useEffect(() => {
+    const loadLottie = async () => {
+      if (window.lottie && lottieRef.current) {
+        window.lottie.loadAnimation({
+          container: lottieRef.current,
+          renderer: "svg",
+          loop: true,
+          autoplay: true,
+          path: "path/to/Doctor-Medical-Surgeon-Healthcare-Animation.json",
+        });
+      }
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js";
+    script.onload = loadLottie;
+    document.body.appendChild(script);
+  }, []);
+
   return (
     <div ref={vantaRef} className="relative min-h-screen">
       <div className="relative z-10">
@@ -75,7 +95,7 @@ export default function Home({ onLogout }) {
 
             <SearchBar />
 
-            {/* ✅ PROFESSIONAL CTA BUTTON */}
+            {/* ✅ BUTTON WITH ANIMATION */}
             <button
               onClick={() => navigate("/assistant")}
               className="
@@ -91,6 +111,7 @@ export default function Home({ onLogout }) {
                 hover:shadow-xl hover:shadow-blue-300
                 transition-all duration-200
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                animate-pulse
               "
             >
               Ask SmartRX
