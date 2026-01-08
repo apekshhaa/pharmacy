@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import lottie from "lottie-web";
 
 export default function LoadingOverlay() {
   const lottieRef = useRef(null);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     if (!lottieRef.current) return;
@@ -15,6 +16,13 @@ export default function LoadingOverlay() {
     });
     return () => anim?.destroy();
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">

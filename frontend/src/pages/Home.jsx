@@ -70,8 +70,7 @@ export default function Home({ onLogout, onNavigate }) {
           {/* ✅ Larger CTA below the animation */}
           <button
             onClick={() => {
-              onNavigate?.();
-              navigate("/assistant");
+              onNavigate?.(() => navigate("/assistant")); // 🔥 Show loading, then navigate
             }}
             className="
               mt-6

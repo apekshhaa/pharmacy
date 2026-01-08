@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header";
 
-export default function Assistant({ onLogout }) {
+export default function Assistant({ onLogout, onNavigate }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -18,18 +18,21 @@ export default function Assistant({ onLogout }) {
 
   const sendMessage = () => {
     if (!input.trim()) return;
-
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", text: input },
-      {
-        role: "assistant",
-        text:
-          "Thanks for sharing. Based on your symptoms, here’s some general guidance. If symptoms persist or worsen, please consult a doctor.",
-      },
-    ]);
-
+    
+    const userMessage = input;
     setInput("");
+
+    onNavigate?.(() => {
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", text: userMessage },
+        {
+          role: "assistant",
+          text:
+            "Thanks for sharing. Based on your symptoms, here's some general guidance. If symptoms persist or worsen, please consult a doctor.",
+        },
+      ]);
+    }); // 🔥 Show loading screen, then add messages
   };
 
   return (

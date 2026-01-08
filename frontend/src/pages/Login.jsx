@@ -103,7 +103,7 @@ import { Link } from "react-router-dom";
 import "../components/Login.css";
 import { loginWithEmail, loginWithGoogle } from "../services/firebaseAuth";
 
-export default function Login({ setIsAuthenticated }) {
+export default function Login({ setIsAuthenticated, onNavigate }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -122,7 +122,7 @@ export default function Login({ setIsAuthenticated }) {
 
     try {
       await loginWithEmail(email, password);
-      setIsAuthenticated(true);
+      onNavigate?.(() => setIsAuthenticated(true)); // 🔥 Show loading, then authenticate
     } catch (err) {
       if (err.code === "auth/wrong-password")
         setError("Incorrect password");
@@ -138,7 +138,7 @@ export default function Login({ setIsAuthenticated }) {
     setError("");
     try {
       await loginWithGoogle();
-      setIsAuthenticated(true);
+      onNavigate?.(() => setIsAuthenticated(true)); // 🔥 Show loading, then authenticate
     } catch (err) {
       setError("Google login failed");
     }

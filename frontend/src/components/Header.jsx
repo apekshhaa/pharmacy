@@ -461,6 +461,7 @@ export default function Header({ hideLogo = false, onLogout }) {
 
   try {
     await logoutUser(); // 🔥 Firebase logout
+    onLogout?.(); // ✅ Update app state
   } catch (err) {
     console.error("Logout failed:", err);
   }

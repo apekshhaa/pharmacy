@@ -146,7 +146,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../components/Signup.css";
 import { signupWithEmail } from "../services/firebaseAuth";
 
-export default function Signup({ setIsAuthenticated }) {
+export default function Signup({ setIsAuthenticated, onNavigate }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -178,8 +178,10 @@ export default function Signup({ setIsAuthenticated }) {
       console.log("Firebase User:", userCredential.user);
 
       // ✅ Authentication handled by Firebase
-      setIsAuthenticated(true);
-      navigate("/");
+      onNavigate?.(() => {
+        setIsAuthenticated(true);
+        navigate("/");
+      }); // 🔥 Show loading screen, then navigate
     } catch (err) {
       console.error(err);
 
