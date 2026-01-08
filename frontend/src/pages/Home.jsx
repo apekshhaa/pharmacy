@@ -1,7 +1,16 @@
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
+import { useNavigate } from "react-router-dom";
 
-export default function Home({ onLogout }) {
+export default function Home({ onLogout, onNavigate }) {
+  const navigate = useNavigate();
+
+  const goToAssistant = () => {
+    // Use shared loader hook before navigation when available
+    const doNav = () => navigate("/assistant");
+    onNavigate ? onNavigate(doNav) : doNav();
+  };
+
   return (
     <div className="relative min-h-screen bg-transparent">
       <Header hideLogo={false} onLogout={onLogout} />
@@ -25,7 +34,10 @@ export default function Home({ onLogout }) {
               <SearchBar />
             </div>
 
-            <button className="px-6 py-3 bg-white text-black rounded-full font-semibold hover:scale-105 transition">
+            <button
+              onClick={goToAssistant}
+              className="px-6 py-3 bg-white text-black rounded-full font-semibold hover:scale-105 transition"
+            >
               Ask SmartRX
             </button>
           </div>
