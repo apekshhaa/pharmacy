@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import lottie from "lottie-web";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
-import HowItWorks from "../components/HowItWorks";
 import RotatingText from "../components/RotatingText";
 
-export default function Home({ onLogout }) {
+export default function Home({ onLogout, onNavigate }) {
   const navigate = useNavigate();
   const lottieRef = useRef(null);
+  const heroLottieRef = useRef(null);
 
   useEffect(() => {
     if (!lottieRef.current) return;
@@ -17,9 +17,21 @@ export default function Home({ onLogout }) {
       renderer: "svg",
       loop: true,
       autoplay: true,
-      path: "/animations/Doctor,%20Medical,%20Surgeon,%20Healthcare%20Animation.json",
+      path: "/animations/doctor-animation.json",
     });
     return () => anim?.destroy();
+  }, []);
+
+  useEffect(() => {
+    if (!heroLottieRef.current) return;
+    const heroAnim = lottie.loadAnimation({
+      container: heroLottieRef.current,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/animations/doctor-animation.json",
+    });
+    return () => heroAnim?.destroy();
   }, []);
 
   return (
@@ -46,17 +58,29 @@ export default function Home({ onLogout }) {
 
           <SearchBar />
 
-          {/* ✅ BUTTON WITH ANIMATION */}
+          {/* Doctor animation above the CTA, bigger and lower on the page */}
+          <div className="mt-20 flex w-full justify-center">
+            <div
+              ref={heroLottieRef}
+              className="w-[180px] h-[180px] sm:w-[200px] sm:h-[200px]"
+              aria-label="Doctor animation"
+            />
+          </div>
+
+          {/* ✅ Larger CTA below the animation */}
           <button
-            onClick={() => navigate("/assistant")}
+            onClick={() => {
+              onNavigate?.();
+              navigate("/assistant");
+            }}
             className="
-              mt-8
-              inline-flex items-center justify-center gap-2
-              px-8 py-4
+              mt-6
+              inline-flex items-center justify-center gap-3
+              px-10 py-5
               rounded-full
               bg-blue-600
               text-white
-              text-base font-semibold
+              text-lg font-semibold
               shadow-lg shadow-blue-200
               hover:bg-blue-700
               hover:shadow-xl hover:shadow-blue-300
@@ -64,7 +88,7 @@ export default function Home({ onLogout }) {
               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
             "
           >
-            <span className="text-lg">Ask SmartRX</span>
+            <span className="text-xl">Ask SmartRX</span>
             <div
               ref={lottieRef}
               className="w-0.5 h-0.5"
@@ -72,11 +96,6 @@ export default function Home({ onLogout }) {
               aria-hidden="true"
             />
           </button>
-        </div>
-
-        {/* CONTENT SECTION */}
-        <div className="w-full mt-20 bg-white/90 backdrop-blur-md py-16">
-          <HowItWorks />
         </div>
       </main>
     </div>

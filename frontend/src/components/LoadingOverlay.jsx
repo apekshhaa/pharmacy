@@ -1,0 +1,28 @@
+import { useEffect, useRef } from "react";
+import lottie from "lottie-web";
+
+export default function LoadingOverlay() {
+  const lottieRef = useRef(null);
+
+  useEffect(() => {
+    if (!lottieRef.current) return;
+    const anim = lottie.loadAnimation({
+      container: lottieRef.current,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/animations/capsule.json",
+    });
+    return () => anim?.destroy();
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+      <div
+        ref={lottieRef}
+        className="w-64 h-64"
+        aria-label="Loading animation"
+      />
+    </div>
+  );
+}
