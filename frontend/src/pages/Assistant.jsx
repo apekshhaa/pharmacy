@@ -43,7 +43,7 @@ export default function Assistant({ onLogout }) {
           {/* CHAT HEADER */}
           <div className="px-6 py-4 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              🤖 SmartRX Assistant
+              SmartRX Assistant
             </h2>
             <p className="text-sm text-slate-500">
               AI-powered health guidance
