@@ -73,29 +73,32 @@ export default function Home({ onLogout }) {
               Your intelligent medical assistant
             </h2>
 
-            <div className="flex flex-col items-center gap-10 mt-6">
-              <SearchBar />
+            <SearchBar />
 
-              {/* ✅ PURPLE BUTTON */}
-              <button
-  onClick={() => navigate("/assistant")}
-  style={{
-    backgroundColor: "#7c3aed", // PURPLE
-    color: "white",
-    padding: "16px 32px",
-    borderRadius: "9999px",
-    fontSize: "16px",
-    fontWeight: 600,
-    border: "none",
-    cursor: "pointer",
-  }}
->
-  Ask SmartRX →
-</button>
-
-            </div>
+            {/* ✅ PROFESSIONAL CTA BUTTON */}
+            <button
+              onClick={() => navigate("/assistant")}
+              className="
+                mt-8
+                inline-flex items-center justify-center gap-2
+                px-8 py-4
+                rounded-full
+                bg-blue-600
+                text-white
+                text-base font-semibold
+                shadow-lg shadow-blue-200
+                hover:bg-blue-700
+                hover:shadow-xl hover:shadow-blue-300
+                transition-all duration-200
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+              "
+            >
+              Ask SmartRX
+              <span className="text-lg">→</span>
+            </button>
           </div>
 
+          {/* CONTENT SECTION */}
           <div className="w-full mt-20 bg-white/90 backdrop-blur-md py-16">
             <HowItWorks />
           </div>
