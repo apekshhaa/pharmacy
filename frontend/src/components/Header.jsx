@@ -391,7 +391,7 @@ export default function Header({ hideLogo = false, onLogout }) {
 
   const startListening = () => {
     if (!("webkitSpeechRecognition" in window)) {
-      alert("Speech recognition not supported in this browser");
+      console.warn("Speech recognition not supported in this browser");
       return;
     }
 
@@ -443,11 +443,18 @@ export default function Header({ hideLogo = false, onLogout }) {
 
   const handleLogout = () => {
     setShowLogoutModal(true);
+    document.body.style.overflow = "hidden";
   };
 
   const confirmLogout = () => {
     setShowLogoutModal(false);
-    onLogout();
+    document.body.style.overflow = "";
+    onLogout && onLogout();
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+    document.body.style.overflow = "";
   };
 
   return (
@@ -475,10 +482,7 @@ export default function Header({ hideLogo = false, onLogout }) {
             />
           </button>
 
-          <Menu
-            className="w-6 h-6 cursor-pointer"
-            onClick={() => setOpen(true)}
-          />
+          <Menu className="w-6 h-6 cursor-pointer" onClick={() => setOpen(true)} />
 
           <button onClick={handleLogout} title="Logout">
             <LogOut className="w-6 h-6 cursor-pointer text-gray-700 hover:text-red-500 transition" />
@@ -487,11 +491,8 @@ export default function Header({ hideLogo = false, onLogout }) {
       </header>
 
       <MenuDrawer open={open} setOpen={setOpen} />
-      <LogoutModal 
-        isOpen={showLogoutModal} 
-        onConfirm={confirmLogout}
-        onCancel={() => setShowLogoutModal(false)}
-      />
+
+      <LogoutModal isOpen={showLogoutModal} onConfirm={confirmLogout} onCancel={cancelLogout} />
     </>
   );
 }

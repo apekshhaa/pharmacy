@@ -1,19 +1,71 @@
+import { useEffect, useRef } from "react";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import HowItWorks from "../components/HowItWorks";
 
-
 export default function Home({ onLogout }) {
-return (
-<div>
-<Header hideLogo={false} onLogout={onLogout} />
-<main className="flex flex-col items-center mt-10 px-4">
-<h2 className="text-lg text-slate-600 mb-6">
-Your intelligent medical assistant
-</h2>
-<SearchBar />
-<HowItWorks />
-</main>
-</div>
-);
+  const vantaRef = useRef(null);
+
+  useEffect(() => {
+    let effect = null;
+
+    const loadScript = (src) =>
+      new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[src="${src}"]`);
+        if (existing) return resolve();
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.onload = () => resolve();
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
+
+    const init = async () => {
+      try {
+        if (!window.p5) {
+          await loadScript("https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js");
+        }
+        if (!window.VANTA?.TRUNK) {
+          await loadScript("https://unpkg.com/vanta/dist/vanta.trunk.min.js");
+        }
+        if (vantaRef.current && window.VANTA?.TRUNK) {
+          effect = window.VANTA.TRUNK({
+            el: vantaRef.current,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.0,
+            minWidth: 200.0,
+            scale: 1.0,
+            scaleMobile: 1.0,
+            color: 0xc7ade5,
+            backgroundColor: 0xffffff,
+            spacing: 1.0,
+            chaos: 1.5,
+          });
+        }
+      } catch (e) {
+        console.error("VANTA init failed:", e);
+      }
+    };
+
+    init();
+    return () => {
+      if (effect && typeof effect.destroy === "function") effect.destroy();
+    };
+  }, []);
+
+  return (
+    <div ref={vantaRef} className="relative min-h-screen">
+      <div className="relative z-10">
+        <Header hideLogo={false} onLogout={onLogout} />
+        <main className="flex flex-col items-center mt-10">
+          <h2 className="text-lg text-slate-600 mb-6">Your intelligent medical assistant</h2>
+          <SearchBar />
+          <HowItWorks />
+        </main>
+      </div>
+    </div>
+  );
 }
