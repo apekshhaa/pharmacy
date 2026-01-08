@@ -45,7 +45,7 @@ export default function Home({ onLogout }) {
             minWidth: 200.0,
             scale: 1.0,
             scaleMobile: 1.0,
-            color: 0xc7ade5,
+            color: 0x3b82f6,
             backgroundColor: 0xffffff,
             spacing: 1.2,
             chaos: 1.0,

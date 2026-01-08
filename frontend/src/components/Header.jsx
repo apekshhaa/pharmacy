@@ -380,6 +380,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import LogoutModal from "./LogoutModal";
+import smartRxLogo from "../assets/logo2.png";
 
 export default function Header({ hideLogo = false, onLogout }) {
   const [open, setOpen] = useState(false);
@@ -463,8 +464,12 @@ export default function Header({ hideLogo = false, onLogout }) {
         {/* LEFT: LOGO */}
         {!hideLogo ? (
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-blue-600" />
-            <h1 className="text-xl font-bold">🤖 SmartRX</h1>
+            <img
+              src={smartRxLogo}
+              alt="SmartRX"
+              className="w-100 h-100 object-contain"
+              style={{ maxWidth: 200, maxHeight: 200 }}
+            />
           </div>
         ) : (
           <div />
