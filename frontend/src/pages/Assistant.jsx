@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import MessageList from "../components/MessageList";
+import Composer from "../components/Composer";
 
 export default function Assistant({ onLogout }) {
   const [input, setInput] = useState("");
@@ -17,85 +20,63 @@ export default function Assistant({ onLogout }) {
   }, [messages]);
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    const trimmed = input.trim();
+    if (!trimmed) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", text: input },
-      {
-        role: "assistant",
-        text:
-          "Thanks for sharing. Based on your symptoms, here’s some general guidance. If symptoms persist or worsen, please consult a doctor.",
-      },
-    ]);
-
+    const userMsg = { role: "user", text: trimmed };
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
+
+    // Simulated assistant response (placeholder for integration with backend/AI)
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text:
+            "Thanks — here’s a summary based on the information provided. This is educational guidance only. For personalized care, consult a clinician.",
+        },
+      ]);
+    }, 650);
+  };
+
+  const handleSelectHistory = (idx) => {
+    // simple placeholder behavior: show a canned message
+    const historySamples = [
+      { role: "assistant", text: "Previously: simple headache guidance." },
+      { role: "assistant", text: "Previously: interaction checks for common meds." },
+    ];
+    setMessages([messages[0], historySamples[idx] || { role: "assistant", text: "No history." }]);
   };
 
   return (
     <div className="h-screen bg-slate-50 flex flex-col">
       <Header hideLogo={false} onLogout={onLogout} />
 
-      {/* CHAT CONTAINER */}
-      <div className="flex-1 flex justify-center px-4 py-6">
-        <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col overflow-hidden">
-          
-          {/* CHAT HEADER */}
-          <div className="px-6 py-4 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              🤖 SmartRX Assistant
-            </h2>
-            <p className="text-sm text-slate-500">
-              AI-powered health guidance
-            </p>
-          </div>
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar onSelectHistory={handleSelectHistory} />
 
-          {/* MESSAGES */}
-          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 bg-slate-50">
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                    msg.role === "user"
-                      ? "bg-blue-600 text-white rounded-br-md"
-                      : "bg-white text-slate-800 border border-slate-200 rounded-bl-md"
-                  }`}
-                >
-                  {msg.text}
-                </div>
+        <main className="flex-1 flex justify-center items-stretch px-4 py-6">
+          <div className="w-full max-w-5xl bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4">
+              <div>
+                <h1 className="text-lg font-semibold text-slate-800 flex items-center gap-3">
+                  <span className="text-2xl">🤖</span> SmartRX Assistant
+                </h1>
+                <p className="text-sm text-slate-500">AI-assisted, safety-first health guidance</p>
               </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
 
-          {/* INPUT BAR */}
-          <div className="px-6 py-4 border-t border-slate-200 bg-white">
-            <div className="flex items-center gap-3">
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                placeholder="Describe symptoms or ask about a medicine..."
-                className="flex-1 px-4 py-3 rounded-full border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />
-              <button
-                onClick={sendMessage}
-                className="px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
-              >
-                Send →
-              </button>
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-slate-500">Model: private</div>
+                <div className="px-3 py-1 bg-slate-100 text-xs rounded-full text-slate-700">HIPAA-aware</div>
+              </div>
             </div>
 
-            <p className="mt-2 text-xs text-slate-500 text-center">
-              SmartRX provides guidance only and does not replace professional medical advice.
-            </p>
+            <MessageList messages={messages} messagesEndRef={messagesEndRef} />
+
+            <Composer input={input} setInput={setInput} onSend={sendMessage} />
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
