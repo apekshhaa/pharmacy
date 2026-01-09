@@ -5,6 +5,7 @@ import {
   signInWithPopup,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 import { auth } from "../firebase/firebaseConfig";
@@ -28,3 +29,7 @@ export const logoutUser = () => signOut(auth);
 // Auth listener
 export const onAuthChange = (callback) =>
   onAuthStateChanged(auth, callback);
+
+// 🔐 Forgot Password
+export const resetPassword = (email) =>
+  sendPasswordResetEmail(auth, email);

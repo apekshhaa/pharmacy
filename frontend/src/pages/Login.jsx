@@ -101,8 +101,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../components/Login.css";
+import { loginWithEmail, loginWithGoogle } from "../services/firebaseAuth";
+import { resetPassword } from "../services/firebaseAuth";
 
-export default function Login({ setIsAuthenticated }) {
+
+export default function Login({ setIsAuthenticated, onNavigate }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -112,52 +115,53 @@ export default function Login({ setIsAuthenticated }) {
     e.preventDefault();
     setError("");
 
-    if (!email) {
-      setError("Please enter your email first");
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    if (!password) {
-      setError("Please enter your password");
-      return;
-    }
+    if (!email) return setError("Please enter your email first");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return setError("Please enter a valid email address");
+    if (!password) return setError("Please enter your password");
 
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setError("");
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setIsAuthenticated(true);
-      } else {
-        setError(data.message || "Login failed");
-      }
+      await loginWithEmail(email, password);
+      onNavigate?.(() => setIsAuthenticated(true)); // 🔥 Show loading, then authenticate
     } catch (err) {
-      setError("❌ Server error. Please try again later.");
-      console.error(err);
+      if (err.code === "auth/wrong-password")
+        setError("Incorrect password");
+      else if (err.code === "auth/user-not-found")
+        setError("User not found. Please sign up.");
+      else setError("Login failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError("Google login not available with backend authentication");
+    setError("");
+    try {
+      await loginWithGoogle();
+      onNavigate?.(() => setIsAuthenticated(true)); // 🔥 Show loading, then authenticate
+    } catch (err) {
+      setError("Google login failed");
+    }
   };
+
+  const handleForgotPassword = async () => {
+  if (!email) {
+    setError("Please enter your email to reset password");
+    return;
+  }
+
+  try {
+    await resetPassword(email);
+    setError("");
+    alert("📩 Password reset link sent to your email");
+  } catch (err) {
+    console.error(err);
+    setError("❌ Failed to send reset email");
+  }
+};
+
 
   return (
     <div className="login-page">
@@ -188,6 +192,15 @@ export default function Login({ setIsAuthenticated }) {
           />
           <label>Password</label>
         </div>
+
+        {/* 🔐 Forgot Password link */}
+        <span
+          className="forgot-password-link"
+          onClick={handleForgotPassword}
+        >
+          Forgot password?
+        </span>
+
 
         <button className="login-btn" disabled={loading}>
           {loading ? "Logging in..." : "Login"}

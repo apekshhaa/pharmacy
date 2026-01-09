@@ -10,4 +10,15 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  // Allow Firebase popups to close themselves without COOP blocking
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
+  },
+  preview: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
+  },
 })

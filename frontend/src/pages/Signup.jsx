@@ -144,8 +144,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../components/Signup.css";
+import { signupWithEmail } from "../services/firebaseAuth";
 
-export default function Signup({ setIsAuthenticated }) {
+export default function Signup({ setIsAuthenticated, onNavigate }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -158,62 +159,37 @@ export default function Signup({ setIsAuthenticated }) {
     e.preventDefault();
     setError("");
 
-    if (!name) {
-      setError("Please enter your name first");
-      return;
-    }
-
-    if (!email) {
-      setError("Please enter your email");
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    if (!phone) {
-      setError("Please enter your phone number");
-      return;
-    }
-
-    if (!password) {
-      setError("Please create a password");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
+    // ✅ Existing validations (UNCHANGED)
+    if (!name) return setError("Please enter your name first");
+    if (!email) return setError("Please enter your email");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return setError("Please enter a valid email address");
+    if (!phone) return setError("Please enter your phone number");
+    if (!password) return setError("Please create a password");
+    if (password.length < 6)
+      return setError("Password must be at least 6 characters");
 
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, phone, password }),
-      });
+      // 🔥 Firebase Signup
+      const userCredential = await signupWithEmail(email, password);
 
-      const data = await response.json();
+      console.log("Firebase User:", userCredential.user);
 
-      if (response.ok) {
-        setError("");
-        // Save user data to localStorage
-        const userData = { name, email, id: Date.now() };
-        localStorage.setItem("user", JSON.stringify(userData));
+      // ✅ Authentication handled by Firebase
+      onNavigate?.(() => {
         setIsAuthenticated(true);
-        navigate("/"); // Redirect to home
-      } else {
-        setError(data.message || "Signup failed");
-      }
+        navigate("/");
+      }); // 🔥 Show loading screen, then navigate
     } catch (err) {
-      setError("❌ Server error. Please try again later.");
       console.error(err);
+
+      if (err.code === "auth/email-already-in-use") {
+        setError("Email already registered");
+      } else {
+        setError("Signup failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

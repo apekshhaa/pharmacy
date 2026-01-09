@@ -1,82 +1,71 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import lottie from "lottie-web";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
-import HowItWorks from "../components/HowItWorks";
+import { useNavigate } from "react-router-dom";
 import RotatingText from "../components/RotatingText";
+import lottie from "lottie-web";
 
-export default function Home({ onLogout }) {
+export default function Home({ onLogout, onNavigate }) {
   const navigate = useNavigate();
-  const lottieRef = useRef(null);
+  const doctorAnimRef = useRef(null);
 
   useEffect(() => {
-    if (!lottieRef.current) return;
+    if (!doctorAnimRef.current) return;
     const anim = lottie.loadAnimation({
-      container: lottieRef.current,
+      container: doctorAnimRef.current,
       renderer: "svg",
       loop: true,
       autoplay: true,
-      path: "/animations/Doctor,%20Medical,%20Surgeon,%20Healthcare%20Animation.json",
+      path: "/animations/doctor-animation.json",
     });
     return () => anim?.destroy();
   }, []);
 
+  const goToAssistant = () => {
+    const doNav = () => navigate("/assistant");
+    onNavigate ? onNavigate(doNav) : doNav();
+  };
+
   return (
-    <div className="relative min-h-screen bg-white">
+    <div className="min-h-screen">
       <Header hideLogo={false} onLogout={onLogout} />
 
-      <main className="flex flex-col items-center mt-14">
-        <div className="w-full max-w-4xl px-4 text-center">
-          <h2 className="text-lg text-slate-600 mb-6 inline-flex items-center justify-center gap-3 flex-wrap">
-            <span>Your</span>
-            <span className="relative inline-block">
-              {/* Blue glow layer behind */}
-              <span className="absolute -inset-2 bg-blue-400/50 rounded-lg blur-lg"></span>
-              {/* Rotating text with blue highlight */}
-              <span className="relative px-3 py-1 bg-blue-600 rounded-lg inline-block">
-                <RotatingText
-                  texts={["intelligent", "smart", "clever", "insightful", "savvy"]}
-                  mainClassName="text-white font-semibold inline"
-                />
-              </span>
-            </span>
-            <span>medical assistant</span>
-          </h2>
-
-          <SearchBar />
-
-          {/* ✅ BUTTON WITH ANIMATION */}
-          <button
-            onClick={() => navigate("/assistant")}
-            className="
-              mt-8
-              inline-flex items-center justify-center gap-2
-              px-8 py-4
-              rounded-full
-              bg-blue-600
-              text-white
-              text-base font-semibold
-              shadow-lg shadow-blue-200
-              hover:bg-blue-700
-              hover:shadow-xl hover:shadow-blue-300
-              transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-            "
-          >
-            <span className="text-lg">Ask SmartRX</span>
-            <div
-              ref={lottieRef}
-              className="w-0.5 h-0.5"
-              style={{ width: 2, height: 2, overflow: "hidden" }}
-              aria-hidden="true"
+      <main className="px-6 py-12">
+        <div className="mx-auto max-w-4xl text-center">
+          {/* Title with rotating text */}
+          <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-8">
+            <span>Your </span>
+            <RotatingText
+              texts={[
+                "intelligent",
+                "smart",
+                "advanced",
+                "AI-powered",
+              ]}
+              splitBy="characters"
+              staggerDuration={0.03}
+              mainClassName="text-blue-700"
             />
-          </button>
-        </div>
+            <span> medical assistant</span>
+          </h1>
 
-        {/* CONTENT SECTION */}
-        <div className="w-full mt-20 bg-white/90 backdrop-blur-md py-16">
-          <HowItWorks />
+          {/* Search bar */}
+          <div className="max-w-xl mx-auto mb-8">
+            <SearchBar />
+          </div>
+
+          {/* Doctor animation */}
+          <div className="flex justify-center mb-6">
+            <div ref={doctorAnimRef} className="w-[320px] h-[320px] md:w-[420px] md:h-[420px]" />
+          </div>
+
+          {/* Ask SmartRX button */}
+          <button
+            onClick={goToAssistant}
+            className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition"
+          >
+            Ask SmartRX
+          </button>
         </div>
       </main>
     </div>

@@ -381,6 +381,7 @@ import { useNavigate } from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import LogoutModal from "./LogoutModal";
 import smartRxLogo from "../assets/logo2.png";
+import { logoutUser } from "../services/firebaseAuth";
 
 
 export default function Header({ hideLogo = false, onLogout }) {
@@ -454,11 +455,17 @@ export default function Header({ hideLogo = false, onLogout }) {
     onLogout && onLogout();
   };*/
 
-  const confirmLogout = () => {
-    setShowLogoutModal(false);
-    document.body.style.overflow = "";
-    onLogout && onLogout();
-  };
+  const confirmLogout = async () => {
+  setShowLogoutModal(false);
+  document.body.style.overflow = "";
+
+  try {
+    await logoutUser(); // 🔥 Firebase logout
+    onLogout?.(); // ✅ Update app state
+  } catch (err) {
+    console.error("Logout failed:", err);
+  }
+};
 
 
   const cancelLogout = () => {
