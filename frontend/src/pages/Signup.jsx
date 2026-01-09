@@ -144,7 +144,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../components/Signup.css";
-import { signupWithEmail } from "../services/firebaseAuth";
 
 export default function Signup({ setIsAuthenticated }) {
   const [name, setName] = useState("");
@@ -159,35 +158,62 @@ export default function Signup({ setIsAuthenticated }) {
     e.preventDefault();
     setError("");
 
-    // ✅ Existing validations (UNCHANGED)
-    if (!name) return setError("Please enter your name first");
-    if (!email) return setError("Please enter your email");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return setError("Please enter a valid email address");
-    if (!phone) return setError("Please enter your phone number");
-    if (!password) return setError("Please create a password");
-    if (password.length < 6)
-      return setError("Password must be at least 6 characters");
+    if (!name) {
+      setError("Please enter your name first");
+      return;
+    }
+
+    if (!email) {
+      setError("Please enter your email");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!phone) {
+      setError("Please enter your phone number");
+      return;
+    }
+
+    if (!password) {
+      setError("Please create a password");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      // 🔥 Firebase Signup
-      const userCredential = await signupWithEmail(email, password);
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, phone, password }),
+      });
 
-      console.log("Firebase User:", userCredential.user);
+      const data = await response.json();
 
-      // ✅ Authentication handled by Firebase
-      setIsAuthenticated(true);
-      navigate("/");
-    } catch (err) {
-      console.error(err);
-
-      if (err.code === "auth/email-already-in-use") {
-        setError("Email already registered");
+      if (response.ok) {
+        setError("");
+        // Save user data to localStorage
+        const userData = { name, email, id: Date.now() };
+        localStorage.setItem("user", JSON.stringify(userData));
+        setIsAuthenticated(true);
+        navigate("/"); // Redirect to home
       } else {
-        setError("Signup failed. Please try again.");
+        setError(data.message || "Signup failed");
       }
+    } catch (err) {
+      setError("❌ Server error. Please try again later.");
+      console.error(err);
     } finally {
       setLoading(false);
     }

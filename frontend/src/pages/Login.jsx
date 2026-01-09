@@ -101,7 +101,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../components/Login.css";
-import { loginWithEmail, loginWithGoogle } from "../services/firebaseAuth";
 
 export default function Login({ setIsAuthenticated }) {
   const [email, setEmail] = useState("");
@@ -113,35 +112,51 @@ export default function Login({ setIsAuthenticated }) {
     e.preventDefault();
     setError("");
 
-    if (!email) return setError("Please enter your email first");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return setError("Please enter a valid email address");
-    if (!password) return setError("Please enter your password");
+    if (!email) {
+      setError("Please enter your email first");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!password) {
+      setError("Please enter your password");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      await loginWithEmail(email, password);
-      setIsAuthenticated(true);
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setError("");
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setIsAuthenticated(true);
+      } else {
+        setError(data.message || "Login failed");
+      }
     } catch (err) {
-      if (err.code === "auth/wrong-password")
-        setError("Incorrect password");
-      else if (err.code === "auth/user-not-found")
-        setError("User not found. Please sign up.");
-      else setError("Login failed. Try again.");
+      setError("❌ Server error. Please try again later.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError("");
-    try {
-      await loginWithGoogle();
-      setIsAuthenticated(true);
-    } catch (err) {
-      setError("Google login failed");
-    }
+    setError("Google login not available with backend authentication");
   };
 
   return (
